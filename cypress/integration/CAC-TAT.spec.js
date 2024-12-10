@@ -9,7 +9,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
     })
 
     Cypress._.times(3, function(){
-        it.only('preenche os campos obrigatórios e envia o formulário', ()=>{
+        it('preenche os campos obrigatórios e envia o formulário', ()=>{
 
             cy.clock()
     
@@ -187,6 +187,42 @@ describe('Central de Atendimento ao Cliente TAT', function() {
         cy.contains('Talking About Testing').should('be.visible')
     })
 
-    it('testa a página da política de privacidade de forma independente')
+    it('exibe e esconde as mensagens de sucesso e erro usando o .invoke', () => {
+        cy.get('.success')
+          .should('not.be.visible')
+          .invoke('show')
+          .should('be.visible')
+          .and('contain', 'Mensagem enviada com sucesso.')
+          .invoke('hide')
+          .should('not.be.visible')
+        cy.get('.error')
+          .should('not.be.visible')
+          .invoke('show')
+          .should('be.visible')
+          .and('contain', 'Valide os campos obrigatórios!')
+          .invoke('hide')
+          .should('not.be.visible')
+      })
 
+
+      it('preenche a area de texto usando o comando invoke', function(){
+        const longText = Cypress._.repeat('0123456789', 10)
+
+        cy.get('#open-text-area')
+            .invoke('val', longText)
+            .should('have.value', longText)
+      })
+
+      it('faz uma requisição HTTP', function(){
+        cy.request({
+            method: 'GET',
+            url: 'https://cac-tat.s3.eu-central-1.amazonaws.com/index.html'
+        }).then((response) =>{
+            expect(response.status).to.equal(200);
+            expect(response.statusText).to.equal('OK');
+            expect(response.body).to.include('CAC TAT')
+        })
+        
+
+      })
   })
